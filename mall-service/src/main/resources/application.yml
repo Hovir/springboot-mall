@@ -1,0 +1,72 @@
+server:
+  port: 8081
+
+mybatis:
+  typeAliasesPackage: com.organization.entity
+  mapperLocations: classpath:mapper/*/*.xml
+  configuration:
+        log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
+        map-underscore-to-camel-case: true  #开启驼峰命名自动转换
+
+pagehelper:
+    helperDialect: mysql
+    reasonable: true
+    supportMethodsArguments: true
+
+dubbo:
+  application:
+    name: provider
+  protocol:
+    name: dubbo
+    port: 20881
+  registry:
+    address: zookeeper://192.168.238.129:2181 #192.168.1.105:2181
+  scan:
+    base-packages: com.organization
+
+spring:
+  profiles:
+    active: prod
+
+  redis:
+    database: 0
+    host: 192.168.238.129
+    port: 6379
+    password:
+#    cluster:
+#      nodes:
+#       - 192.168.238.129:7001
+#       - 192.168.238.129:7002
+#       - 192.168.238.129:7003
+#       - 192.168.238.129:7004
+#       - 192.168.238.129:7005
+#       - 192.168.238.129:7006
+    lettuce:
+      pool:
+        max-active: 8
+        max-idle: 8
+        max-wait: -1ms
+        min-idle: 0
+      shutdown-timeout: 1000ms
+
+---
+
+spring:
+  profiles: dev
+  datasource:
+      url: jdbc:mysql://localhost:3306/springboot_mall?serverTimezone=GMT%2B8&characterEncoding=utf-8&useSSL=false
+      username: root
+      password: 123456
+      driver-class-name: com.mysql.cj.jdbc.Driver
+      type: com.alibaba.druid.pool.DruidDataSource
+
+---
+
+spring:
+  profiles: prod
+  datasource:
+      url: jdbc:mysql://192.168.1.169:3306/springboot_mall?serverTimezone=GMT%2B8&characterEncoding=utf-8&useSSL=false
+      username: root
+      password: 123456
+      driver-class-name: com.mysql.cj.jdbc.Driver
+      type: com.alibaba.druid.pool.DruidDataSource

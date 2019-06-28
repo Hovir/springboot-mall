@@ -1,0 +1,118 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd" >
+<mapper namespace="com.organization.dao.user.UserVisitMapper">
+    <resultMap id="BaseResultMap" type="com.organization.entity.UserVisit">
+        <id column="id" property="id" jdbcType="VARCHAR"/>
+        <result column="content" property="content" jdbcType="VARCHAR"/>
+        <result column="create_time" property="createTime" jdbcType="TIMESTAMP"/>
+        <result column="update_time" property="updateTime" jdbcType="TIMESTAMP"/>
+        <result column="user_id" property="userId" jdbcType="VARCHAR"/>
+    </resultMap>
+    <sql id="Base_Column_List">
+id, content, create_time, update_time, user_id
+</sql>
+
+    <select id="selectByPrimaryKey" resultMap="BaseResultMap" parameterType="java.lang.String">
+        select
+        <include refid="Base_Column_List"/>
+        from user_visit
+        where id = #{id,jdbcType=VARCHAR}
+    </select>
+
+    <!-- 获取用户回访记录 -->
+    <select id="getUserVisitLog" resultType="map">
+        SELECT
+            ui.id,
+            ui.`user_name`,
+            IFNULL(uv.`content`,"") as content,
+            IFNULL(uv.`create_time`,"") as createTime
+        FROM
+          `user_info` ui
+        LEFT JOIN `user_visit` uv ON ui.id = uv.user_id
+        AND uv.`create_time` = (
+        SELECT
+          MAX(t2.`create_time`)
+        FROM
+          `user_visit` t2
+        WHERE
+          t2.user_id = ui.id
+        GROUP BY
+          t2.user_id
+        )
+        GROUP BY
+          ui.id;
+    </select>
+
+    <insert id="insert" parameterType="com.organization.entity.UserVisit">
+insert into user_visit (id, content, create_time,
+update_time, user_id)
+values (#{id,jdbcType=VARCHAR}, #{content,jdbcType=VARCHAR}, #{createTime,jdbcType=TIMESTAMP},
+#{updateTime,jdbcType=TIMESTAMP}, #{userId,jdbcType=VARCHAR})
+</insert>
+
+    <insert id="insertSelective" parameterType="com.organization.entity.UserVisit">
+        insert into user_visit
+        <trim prefix="(" suffix=")" suffixOverrides=",">
+            <if test="id != null">
+                id,
+            </if>
+            <if test="content != null">
+                content,
+            </if>
+            <if test="createTime != null">
+                create_time,
+            </if>
+            <if test="updateTime != null">
+                update_time,
+            </if>
+            <if test="userId != null">
+                user_id,
+            </if>
+        </trim>
+        <trim prefix="values (" suffix=")" suffixOverrides=",">
+            <if test="id != null">
+                #{id,jdbcType=VARCHAR},
+            </if>
+            <if test="content != null">
+                #{content,jdbcType=VARCHAR},
+            </if>
+            <if test="createTime != null">
+                #{createTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="updateTime != null">
+                #{updateTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="userId != null">
+                #{userId,jdbcType=VARCHAR},
+            </if>
+        </trim>
+    </insert>
+
+    <update id="updateByPrimaryKeySelective" parameterType="com.organization.entity.UserVisit">
+        update user_visit
+        <set>
+            <if test="content != null">
+                content = #{content,jdbcType=VARCHAR},
+            </if>
+            <if test="createTime != null">
+                create_time = #{createTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="updateTime != null">
+                update_time = #{updateTime,jdbcType=TIMESTAMP},
+            </if>
+            <if test="userId != null">
+                user_id = #{userId,jdbcType=VARCHAR},
+            </if>
+        </set>
+        where id = #{id,jdbcType=VARCHAR}
+    </update>
+    <update id="updateByPrimaryKey" parameterType="com.organization.entity.UserVisit">
+        update user_visit
+        set content = #{content,jdbcType=VARCHAR},
+        create_time = #{createTime,jdbcType=TIMESTAMP},
+        update_time = #{updateTime,jdbcType=TIMESTAMP},
+        user_id = #{userId,jdbcType=VARCHAR}
+        where id = #{id,jdbcType=VARCHAR}
+    </update>
+
+</mapper>
